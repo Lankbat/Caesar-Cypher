@@ -1,9 +1,8 @@
+#pragma warning(disable : 4996)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-
 // method for encrypting the plaintext
 void encrypt(char *plaintext, int key, char *ciphertext) {
     int i;
@@ -16,7 +15,7 @@ void encrypt(char *plaintext, int key, char *ciphertext) {
             if (isupper(plaintext[i]))
                 ciphertext[i] = ((plaintext[i] - 'A' + key) % 26) + 'A';
             else
-                ciphertext[i] = ((plaintext[i] - 'a' + key) % 26) + 'a';
+                ciphertext[i] = ((plaintext[i] - 'a' + key) % 26) + 'A';
         } else 
         {
             ciphertext[i] = plaintext[i];
@@ -35,7 +34,7 @@ void decrypt(char *ciphertext, int key, char *plaintext) {
         {
             // check if the character is uppercase or lowercase
             if (isupper(ciphertext[i]))
-                plaintext[i] = ((ciphertext[i] - 'A' - key + 26) % 26) + 'A';
+                plaintext[i] = ((ciphertext[i] - 'A' - key + 26) % 26) + 'a';
             else
                 plaintext[i] = ((ciphertext[i] - 'a' - key + 26) % 26) + 'a';
         } else 
@@ -54,7 +53,7 @@ int main(int argc, char *argv[])
     FILE *fin, *fout;
     char *buffer = NULL;
     size_t bufsize = 0;
-    ssize_t len;
+    size_t len;
 
     if (argc != 2) 
     {
@@ -68,6 +67,10 @@ int main(int argc, char *argv[])
     {
         printf("Enter the key for encryption: ");
         scanf("%d", &key);
+		if(key < 0)
+			key = (key % 26) + 26;  //Computer does not account for negatives when doing modulus. For example, -19 mod 26 is congruent to 7, but the computer keeps it as -19 since 19 < 26
+		else //if not negative, reduce anyway just in case (should not matter)
+			key = key % 26;
         printf("Enter the input plaintext file name: ");
         scanf("%s", input_file);
         printf("Enter the output ciphertext file name: ");
@@ -115,6 +118,11 @@ int main(int argc, char *argv[])
     {
         printf("Enter the key for decryption: ");
         scanf("%d", &key);
+		//Reducing keys mod 26:
+		if(key < 0)
+			key = (key % 26) + 26;
+		else 
+			key = key % 26;
         printf("Enter the input ciphertext file name: ");
         scanf("%s", input_file);
         printf("Enter the output plaintext file name: ");
